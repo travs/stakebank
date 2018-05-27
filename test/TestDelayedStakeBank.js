@@ -8,7 +8,7 @@ contract('DelayedStakeBank', function (accounts) {
 
     beforeEach(async () => {
         initialBalance = 10000;
-        unstakeDelay = 1000;
+        unstakeDelay = 5;
         token = await TokenMock.new();
         bank = await DelayedStakeBank.new(token.address, unstakeDelay);
 
@@ -51,7 +51,8 @@ contract('DelayedStakeBank', function (accounts) {
         assert.equal(await bank.totalStakedFor.call(accounts[0]), initialBalance);
         assert.equal(Number(await token.balanceOf.call(accounts[0])), 0);
         assert.equal(await token.balanceOf.call(bank.address), initialBalance);
-        await utils.advanceTime(unstakeDelay);
+        const initialStakeBlock = web3.eth.blockNumber;
+        await utils.advanceToBlock(initialStakeBlock + unstakeDelay);
         await bank.unstake(initialBalance, '0x0');
         assert.equal(await bank.totalStakedFor.call(accounts[0]), 0);
         assert.equal(Number(await token.balanceOf.call(accounts[0])), initialBalance);

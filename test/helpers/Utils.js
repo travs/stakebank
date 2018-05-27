@@ -29,23 +29,7 @@ async function advanceToBlock(number) {
     }
 }
 
-async function advanceTime(duration) {
-    return new Promise((resolve, reject) => {
-        web3.currentProvider.sendAsync({
-            jsonrpc: '2.0',
-            method: 'evm_increaseTime',
-            params: [duration],
-            id: Date.now(),
-        }, async (err, res) => {
-            if (err) reject(err);
-            await advanceBlock();
-            resolve(res);
-        });
-    });
-}
-
 module.exports = {
     advanceToBlock: advanceToBlock,
     ensureException: ensureException,
-    advanceTime: advanceTime,
 };

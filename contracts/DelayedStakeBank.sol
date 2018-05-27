@@ -5,7 +5,7 @@ import "./StakeBank.sol";
 contract DelayedStakeBank is StakeBank {
 
     uint256 unstakeDelay;
-    mapping (address => uint256) lastStake;
+    mapping (address => uint256) lastStaked;
 
     /// @param _token Token that can be staked.
     /// @param _unstakeDelay Earliest time (s) after last stake that stake can be withdrawn
@@ -26,7 +26,7 @@ contract DelayedStakeBank is StakeBank {
     /// @param data Data field used for signalling in more complex staking applications.
     function stakeFor(address user, uint256 amount, bytes data) public {
         require(user == msg.sender);
-        lastStake[msg.sender] = block.timestamp;
+        lastStaked[msg.sender] = block.number;
         StakeBank.stakeFor(user, amount, data);
     }
 
@@ -35,7 +35,7 @@ contract DelayedStakeBank is StakeBank {
     /// @param amount Amount of tokens to unstake.
     /// @param data Data field used for signalling in more complex staking applications.
     function unstake(uint256 amount, bytes data) public {
-        require(block.timestamp >= lastStake[msg.sender].add(unstakeDelay));
+        require(block.number >= lastStaked[msg.sender].add(unstakeDelay));
         StakeBank.unstake(amount, data);
     }
 }
